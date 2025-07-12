@@ -17,8 +17,7 @@ const User = () => {
     wantedSkill: '',
     message: '',
   });
-
-    useAuthCheck();
+ 
 
 
 

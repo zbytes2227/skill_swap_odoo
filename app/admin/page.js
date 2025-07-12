@@ -117,8 +117,7 @@ export default function AdminPage() {
       </div>
     );
   }
-
-  
+ 
   return (
     <div className="p-8 bg-gradient-to-tr from-gray-100 to-white min-h-screen space-y-10">
       <h1 className="text-4xl font-bold text-center text-gray-900 tracking-tight">🛠️ Admin Dashboard</h1>
