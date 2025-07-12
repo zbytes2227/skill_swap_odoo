@@ -10,6 +10,7 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [availability, setAvailability] = useState("");
 
   const router = useRouter();
 
@@ -29,18 +30,32 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setLoading(true); // Start loading before fetching
-    fetch(`/api/users?type=public&page=${currentPage}&limit=5&search=${searchTerm}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setUsers(data.users);
-          setTotalPages(data.pagination.totalPages);
-        }
-        setLoading(false); // End loading after fetch
-      })
-      .catch(() => setLoading(false));
-  }, [currentPage, searchTerm]);
+  setLoading(true); // Start loading before fetching
+
+  // Build query string dynamically
+  const query = new URLSearchParams({
+    type: 'public',
+    page: currentPage,
+    limit: 5,
+    search: searchTerm,
+  });
+
+  if (availability) {
+    query.append('availability', availability);
+  }
+
+  fetch(`/api/users?${query.toString()}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setUsers(data.users);
+        setTotalPages(data.pagination.totalPages);
+      }
+      setLoading(false); // End loading after fetch
+    })
+    .catch(() => setLoading(false));
+}, [availability, currentPage, searchTerm]);
+
 
   const handleRequest = (user) => {
     if (!isAuthenticated) {
@@ -82,12 +97,19 @@ export default function Home() {
       </div>
 
  <div className="flex flex-col md:flex-row items-center gap-4 mb-10">
-  <div className="relative w-full md:w-52">
-    <select className="appearance-none w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-      <option>Availability</option>
-      <option>Weekends</option>
-      <option>Evenings</option>
-    </select>
+  <div className="relative w-full md:w-52"> 
+      <select
+        value={availability}
+        onChange={(e) => setAvailability(e.target.value)}
+        className="appearance-none w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+      >
+        <option value="">Availability</option>
+        <option value="weekends">Weekends</option>
+        <option value="weekdays">Weekdays</option>
+        <option value="mornings">Mornings</option>
+        <option value="evenings">Evenings</option>
+        <option value="nights">Nights</option>
+      </select>
     <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
         <path d="M19 9l-7 7-7-7" />

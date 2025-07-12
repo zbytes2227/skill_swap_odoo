@@ -4,7 +4,7 @@ import connectDb from "../../middleware/mongoose";
 const handler = async (req, res) => {
   if (req.method === "GET") {
     try {
-      const { _id, type, search = "", page = 1, limit = 10 } = req.query;
+      const { _id, type, search = "", page = 1, limit = 10, availability } = req.query;
 
       // If _id is provided, return that specific user
       if (_id) {
@@ -60,6 +60,12 @@ const handler = async (req, res) => {
         if (loggedInUserId) {
           query._id = { $ne: loggedInUserId }; // exclude logged-in user
         }
+
+
+        if (availability) {
+          query.availability = availability; // No need to use $in if it's one value
+        }
+
 
         const pageNum = parseInt(page, 10);
         const limitNum = parseInt(limit, 10);

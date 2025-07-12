@@ -1,5 +1,6 @@
 'use client';
 import Navbar from '@/components/Navbar';
+import useAuthCheck from '@/components/useAuthCheck';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -26,6 +27,7 @@ const Page = () => {
     fetchCurrentUser();
   }, []);
 
+    useAuthCheck();
 
 
   const updateRequestStatus = async (requestId, status) => {

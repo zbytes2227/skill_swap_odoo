@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import useAuthCheck from '@/components/useAuthCheck';
 
 const User = () => {
   const searchParams = useSearchParams();
@@ -16,6 +17,9 @@ const User = () => {
     wantedSkill: '',
     message: '',
   });
+
+    useAuthCheck();
+
 
 
   useEffect(() => {
