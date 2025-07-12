@@ -27,7 +27,7 @@ const Page = () => {
     fetchCurrentUser();
   }, []);
 
-    useAuthCheck();
+     
 
 
   const updateRequestStatus = async (requestId, status) => {
