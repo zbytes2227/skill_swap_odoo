@@ -1,4 +1,5 @@
 'use client';
+import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
@@ -80,6 +81,8 @@ const Page = () => {
   if (loading) return <div className="text-center mt-10 text-gray-500">Loading your skill swap requests...</div>;
 
   return (
+    <>
+    <Navbar/>
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Your Skill Swap Requests</h1>
 
@@ -342,6 +345,7 @@ const Page = () => {
 
 
     </div>
+    </>
   );
 };
 

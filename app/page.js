@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   const [users, setUsers] = useState([]);
@@ -56,7 +57,7 @@ export default function Home() {
   };
 
   const renderSkeleton = () => (
-    Array.from({ length: 3 }).map((_, idx) => (
+    Array.from({ length: 8 }).map((_, idx) => (
       <div key={idx} className="animate-pulse bg-white rounded-2xl p-6 mb-6 shadow-lg">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="w-24 h-24 bg-gray-200 rounded-full" />
@@ -73,6 +74,8 @@ export default function Home() {
   );
 
   return (
+    <>
+    <Navbar />
     <div className="px-6 py-10 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Browse Public Profiles</h1>
@@ -197,5 +200,6 @@ export default function Home() {
         </button>
       </div>
     </div>
+    </>
   );
 }
