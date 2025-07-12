@@ -1,4 +1,4 @@
-// app/admin/page.js
+ // app/admin/page.js
 'use client';
 import { useEffect, useState } from 'react';
 import jsPDF from 'jspdf';
@@ -8,6 +8,8 @@ export default function AdminPage() {
   const [stats, setStats] = useState({});
   const [report, setReport] = useState({ users: [], swaps: [] });
   const [loading, setLoading] = useState(false);
+  const [adminAuth, setAdminAuth] = useState(false);
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
 
   const fetchStats = async () => {
     const res = await fetch('/api/admin?action=stats');
@@ -68,11 +70,55 @@ export default function AdminPage() {
     fetchReport();
   };
 
-  useEffect(() => {
-    fetchStats();
-    fetchReport();
-  }, []);
+  const handleLogin = async () => {
+    const res = await fetch('/api/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials)
+    });
+    const data = await res.json();
+    if (data.success) setAdminAuth(true);
+    else alert('Invalid credentials');
+  };
 
+  useEffect(() => {
+    if (adminAuth) {
+      fetchStats();
+      fetchReport();
+    }
+  }, [adminAuth]);
+
+  if (!adminAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-sm">
+          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">🔐 Admin Login</h2>
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={credentials.username}
+            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={credentials.password}
+            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+          />
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  
   return (
     <div className="p-8 bg-gradient-to-tr from-gray-100 to-white min-h-screen space-y-10">
       <h1 className="text-4xl font-bold text-center text-gray-900 tracking-tight">🛠️ Admin Dashboard</h1>
