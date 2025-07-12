@@ -69,11 +69,14 @@ const Navbar = () => {
               >
                 Swap Requests
               </Link>
-              <img
-                src={user.profilePhoto || '/images/avatar.png'}
-                alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border border-gray-300"
-              />
+              <Link
+                href="/profile" > 
+                <img
+                  src={user.profilePhoto || '/images/avatar.png'}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover border border-gray-300"
+                />
+              </Link>
             </>
           ) : (
             <Link
