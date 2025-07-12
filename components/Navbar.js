@@ -52,6 +52,12 @@ const Navbar = () => {
           {user ? (
             <>
               <Link
+                href="/"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
+              >
+                Home
+              </Link>
+              <Link
                 href="/profile"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
               >
@@ -62,12 +68,6 @@ const Navbar = () => {
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
               >
                 Swap Requests
-              </Link>
-              <Link
-                href="/"
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 transition"
-              >
-                Home
               </Link>
               <img
                 src={user.profilePhoto || '/images/avatar.png'}
