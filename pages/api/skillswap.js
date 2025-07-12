@@ -22,26 +22,35 @@ const handler = async (req, res) => {
       await request.save();
       return res.status(201).json({ success: true, msg: "Skill swap request sent", request });
     }
-
     if (req.method === "PUT") {
-      const { requestId, status } = req.body;
+      const { requestId, status, feedback, userId } = req.body;
 
-      if (!requestId || !["accepted", "rejected", "pending"].includes(status)) {
-        return res.status(400).json({ success: false, msg: "Invalid request data" });
+      if (!requestId) {
+        return res.status(400).json({ success: false, msg: "Missing request ID" });
       }
 
-      const request = await SkillSwapRequest.findByIdAndUpdate(
-        requestId,
-        { status },
-        { new: true }
-      );
+      const updateData = {};
 
-      if (!request) {
-        return res.status(404).json({ success: false, msg: "Request not found" });
+      if (status && ["completed", "rejected", "pending"].includes(status)) {
+        updateData.status = status;
       }
 
-      return res.status(200).json({ success: true, msg: "Status updated", request });
+      // Handle feedback
+      if (feedback && userId) {
+        const request = await SkillSwapRequest.findById(requestId);
+        if (!request) {
+          return res.status(404).json({ success: false, msg: "Request not found" });
+        }
+
+        const feedbackKey = request.fromUser.toString() === userId ? "fromFeedback" : "toFeedback";
+        updateData[feedbackKey] = feedback;
+      }
+
+      const updatedRequest = await SkillSwapRequest.findByIdAndUpdate(requestId, updateData, { new: true });
+
+      return res.status(200).json({ success: true, msg: "Request updated", request: updatedRequest });
     }
+
 
     if (req.method === "GET") {
       const { userId, role, requestId } = req.query;
@@ -65,8 +74,8 @@ const handler = async (req, res) => {
           role === "sent"
             ? { fromUser: userId }
             : role === "received"
-            ? { toUser: userId }
-            : { $or: [{ fromUser: userId }, { toUser: userId }] };
+              ? { toUser: userId }
+              : { $or: [{ fromUser: userId }, { toUser: userId }] };
 
         const requests = await SkillSwapRequest.find(query)
           .sort({ createdAt: -1 })

@@ -8,6 +8,7 @@ const Page = () => {
   const [receivedRequests, setReceivedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('sent'); // "sent" | "received" | "completed"
+  const [feedbacks, setFeedbacks] = useState({});
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -23,32 +24,32 @@ const Page = () => {
     };
     fetchCurrentUser();
   }, []);
-  
+
 
 
   const updateRequestStatus = async (requestId, status) => {
-  try {
-    const res = await fetch('/api/skillswap', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ requestId, status }),
-    });
+    try {
+      const res = await fetch('/api/skillswap', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, status }),
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      // Update the UI immediately without full refetch
-      setReceivedRequests((prev) =>
-        prev.map((r) => (r._id === requestId ? { ...r, status } : r))
-      );
-    } else {
-      console.error('Failed to update status:', data.msg);
-      alert('Something went wrong updating the request');
+      const data = await res.json();
+      if (data.success) {
+        // Update the UI immediately without full refetch
+        setReceivedRequests((prev) =>
+          prev.map((r) => (r._id === requestId ? { ...r, status } : r))
+        );
+      } else {
+        console.error('Failed to update status:', data.msg);
+        alert('Something went wrong updating the request');
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Server error while updating request');
     }
-  } catch (err) {
-    console.error('Error updating status:', err);
-    alert('Server error while updating request');
-  }
-};
+  };
 
 
   useEffect(() => {
@@ -86,25 +87,22 @@ const Page = () => {
       <div className="flex justify-center mb-8 space-x-4">
         <button
           onClick={() => setTab('sent')}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            tab === 'sent' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
+          className={`px-4 py-2 rounded-full text-sm font-medium ${tab === 'sent' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
         >
           📤 Sent
         </button>
         <button
           onClick={() => setTab('received')}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            tab === 'received' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
+          className={`px-4 py-2 rounded-full text-sm font-medium ${tab === 'received' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
         >
           📥 Received
         </button>
         <button
           onClick={() => setTab('completed')}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            tab === 'completed' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
+          className={`px-4 py-2 rounded-full text-sm font-medium ${tab === 'completed' ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
         >
           ✅ Completed
         </button>
@@ -130,12 +128,11 @@ const Page = () => {
                       </p>
                       {req.message && <p className="text-sm text-gray-500 mt-1">“{req.message}”</p>}
                     </div>
-                    <span className={`text-xs px-3 py-1 rounded-full ${
-                      req.status === 'accepted' ? 'bg-green-100 text-green-700'
-                      : req.status === 'rejected' ? 'bg-red-100 text-red-600'
-                      : req.status === 'completed' ? 'bg-purple-100 text-purple-700'
-                      : 'bg-yellow-100 text-yellow-600'
-                    }`}>
+                    <span className={`text-xs px-3 py-1 rounded-full ${req.status === 'accepted' ? 'bg-green-100 text-green-700'
+                        : req.status === 'rejected' ? 'bg-red-100 text-red-600'
+                          : req.status === 'completed' ? 'bg-purple-100 text-purple-700'
+                            : 'bg-yellow-100 text-yellow-600'
+                      }`}>
                       {req.status}
                     </span>
                   </div>
@@ -146,87 +143,53 @@ const Page = () => {
         </div>
       )}
 
- {tab === 'received' && (
-  <div>
-    <h2 className="text-xl font-semibold text-green-600 mb-4">📥 Requests Received</h2>
-    {receivedRequests.length === 0 ? (
-      <p className="text-gray-500">No one has sent you a request yet.</p>
-    ) : (
-      <ul className="space-y-4">
-        {receivedRequests.map((req) => (
-          <li key={req._id} className="bg-green-50 border border-green-200 p-4 rounded-xl shadow-sm">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium text-gray-800">
-                  From: <Link href={`/user?_id=${req.fromUser._id}`} className="text-green-700">{req.fromUser.name}</Link>
-                </p>
-                <p className="text-sm text-gray-600">
-                  They Offer: <strong>{req.offeredSkill}</strong> | They Want: <strong>{req.wantedSkill}</strong>
-                </p>
-                {req.message && <p className="text-sm text-gray-500 mt-1">“{req.message}”</p>}
-              </div>
-
-              <div className="text-right">
-                <span className={`text-xs px-3 py-1 rounded-full block mb-2 ${
-                  req.status === 'accepted' ? 'bg-green-100 text-green-700'
-                  : req.status === 'rejected' ? 'bg-red-100 text-red-600'
-                  : req.status === 'completed' ? 'bg-purple-100 text-purple-700'
-                  : 'bg-yellow-100 text-yellow-600'
-                }`}>
-                  {req.status}
-                </span>
-
-                {/* Accept / Reject Buttons for Pending Requests */}
-                {req.status === 'pending' && (
-                  <div className="flex space-x-2 justify-end">
-                    <button
-                      onClick={() => updateRequestStatus(req._id, 'accepted')}
-                      className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => updateRequestStatus(req._id, 'rejected')}
-                      className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-)}
-
-
-      {tab === 'completed' && (
+      {tab === 'received' && (
         <div>
-          <h2 className="text-xl font-semibold text-purple-600 mb-4">✅ Completed Requests</h2>
-          {sentRequests.concat(receivedRequests).filter(isComplete).length === 0 ? (
-            <p className="text-gray-500">No completed requests yet.</p>
+          <h2 className="text-xl font-semibold text-green-600 mb-4">📥 Requests Received</h2>
+          {receivedRequests.length === 0 ? (
+            <p className="text-gray-500">No one has sent you a request yet.</p>
           ) : (
             <ul className="space-y-4">
-              {sentRequests.concat(receivedRequests).filter(isComplete).map((req) => (
-                <li key={req._id} className="bg-purple-50 border border-purple-200 p-4 rounded-xl shadow-sm">
+              {receivedRequests.map((req) => (
+                <li key={req._id} className="bg-green-50 border border-green-200 p-4 rounded-xl shadow-sm">
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-gray-800">
-                        {req.fromUser._id === currentUser._id ? (
-                          <>To: <Link href={`/user?_id=${req.toUser._id}`} className="text-blue-700">{req.toUser.name}</Link></>
-                        ) : (
-                          <>From: <Link href={`/user?_id=${req.fromUser._id}`} className="text-green-700">{req.fromUser.name}</Link></>
-                        )}
+                        From: <Link href={`/user?_id=${req.fromUser._id}`} className="text-green-700">{req.fromUser.name}</Link>
                       </p>
                       <p className="text-sm text-gray-600">
-                        Offered: <strong>{req.offeredSkill}</strong> | Wanted: <strong>{req.wantedSkill}</strong>
+                        They Offer: <strong>{req.offeredSkill}</strong> | They Want: <strong>{req.wantedSkill}</strong>
                       </p>
                       {req.message && <p className="text-sm text-gray-500 mt-1">“{req.message}”</p>}
                     </div>
-                    <span className="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700">completed</span>
+
+                    <div className="text-right">
+                      <span className={`text-xs px-3 py-1 rounded-full block mb-2 ${req.status === 'accepted' ? 'bg-green-100 text-green-700'
+                          : req.status === 'rejected' ? 'bg-red-100 text-red-600'
+                            : req.status === 'completed' ? 'bg-purple-100 text-purple-700'
+                              : 'bg-yellow-100 text-yellow-600'
+                        }`}>
+                        {req.status}
+                      </span>
+
+                      {/* Accept / Reject Buttons for Pending Requests */}
+                      {req.status === 'pending' && (
+                        <div className="flex space-x-2 justify-end">
+                          <button
+                            onClick={() => updateRequestStatus(req._id, 'completed')}
+                            className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => updateRequestStatus(req._id, 'rejected')}
+                            className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </li>
               ))}
@@ -234,6 +197,148 @@ const Page = () => {
           )}
         </div>
       )}
+
+      {tab === 'completed' && (
+  <div>
+    <h2 className="text-xl font-semibold text-purple-600 mb-4">✅ Completed Requests</h2>
+    {sentRequests.concat(receivedRequests).filter(isComplete).length === 0 ? (
+      <p className="text-gray-500">No completed requests yet.</p>
+    ) : (
+      <ul className="space-y-6">
+        {sentRequests.concat(receivedRequests).filter(isComplete).map((req) => {
+          const feedback = feedbacks[req._id] || { rating: 0, text: '' };
+
+          const handleStarClick = (stars) => {
+            setFeedbacks((prev) => ({
+              ...prev,
+              [req._id]: { ...prev[req._id], rating: stars }
+            }));
+          };
+
+          const handleFeedbackChange = (e) => {
+            setFeedbacks((prev) => ({
+              ...prev,
+              [req._id]: { ...prev[req._id], text: e.target.value }
+            }));
+          };
+
+          const isFromMe = req.fromUser._id === currentUser._id;
+          const myFeedback = isFromMe ? req.fromFeedback : req.toFeedback;
+          const theirFeedback = isFromMe ? req.toFeedback : req.fromFeedback;
+
+          return (
+            <li key={req._id} className="bg-purple-50 border border-purple-200 p-5 rounded-xl shadow-sm space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium text-gray-800">
+                    {isFromMe ? (
+                      <>To: <Link href={`/user?_id=${req.toUser._id}`} className="text-blue-700">{req.toUser.name}</Link></>
+                    ) : (
+                      <>From: <Link href={`/user?_id=${req.fromUser._id}`} className="text-green-700">{req.fromUser.name}</Link></>
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Offered: <strong>{req.offeredSkill}</strong> | Wanted: <strong>{req.wantedSkill}</strong>
+                  </p>
+                  {req.message && <p className="text-sm text-gray-500 mt-1">“{req.message}”</p>}
+                </div>
+                <span className="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700 h-fit">Completed</span>
+              </div>
+
+              {/* ⭐ Their Feedback */}
+              {theirFeedback?.rating && (
+                <div className="bg-white border border-gray-200 p-3 rounded-md shadow-inner">
+                  <p className="text-sm text-gray-700 mb-1 font-semibold">Feedback You Received:</p>
+                  <div className="flex items-center gap-1 mb-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className={`text-xl ${theirFeedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-600 italic">“{theirFeedback.comment}”</p>
+                </div>
+              )}
+
+              {/* ⭐ My Feedback — show either summary or form */}
+              {myFeedback?.rating ? (
+                <div className="bg-white border border-purple-200 p-3 rounded-md shadow-inner">
+                  <p className="text-sm text-gray-700 mb-1 font-semibold">Your Feedback:</p>
+                  <div className="flex items-center gap-1 mb-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className={`text-xl ${myFeedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-600 italic">“{myFeedback.comment}”</p>
+                </div>
+              ) : (
+                <>
+                  {/* Rating Input */}
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => handleStarClick(star)}
+                        className={`text-2xl ${feedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'}`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Feedback Textarea */}
+                  <textarea
+                    rows="3"
+                    value={feedback.text}
+                    onChange={handleFeedbackChange}
+                    placeholder="Leave a short feedback..."
+                    className="w-full mt-2 px-3 py-2 text-sm border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  />
+
+                  {/* Submit Button */}
+                  <div className="text-right mt-2">
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/skillswap', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              requestId: req._id,
+                              userId: currentUser._id,
+                              feedback: {
+                                rating: feedback.rating,
+                                comment: feedback.text,
+                              }
+                            }),
+                          });
+
+                          const data = await res.json();
+                          if (data.success) {
+                            alert("✅ Feedback submitted!");
+                            location.reload(); // Reload to reflect new feedback
+                          } else {
+                            alert("❌ Failed to submit feedback");
+                          }
+                        } catch (err) {
+                          console.error("Error submitting feedback:", err);
+                          alert("❌ Error occurred");
+                        }
+                      }}
+                      className="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-md shadow-md transition"
+                    >
+                      Submit Feedback
+                    </button>
+                  </div>
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </div>
+)}
+
+
     </div>
   );
 };

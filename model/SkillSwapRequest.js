@@ -12,11 +12,20 @@ const SkillSwapRequestSchema = new mongoose.Schema(
       enum: ['pending', 'accepted', 'rejected'],
       default: 'pending',
     },
+    fromFeedback: {
+      rating: Number,
+      comment: String,
+    },
+    toFeedback: {
+      rating: Number,
+      comment: String,
+    },
   },
   {
     collection: 'SkillSwapRequests',
     timestamps: true,
   }
+
 );
 
 mongoose.models = {};
